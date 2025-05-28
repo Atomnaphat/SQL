@@ -46,7 +46,7 @@ batch_size = 50
 batch_number = 0
 
 while True:
-    # ดึงข้อมูลจาก MongoDB ทีละ 20 เอกสาร
+    # ดึงข้อมูลจาก MongoDB ทีละ batch_size เอกสาร
     mongo_documents = list(mongo_collection.find().skip(batch_number * batch_size).limit(batch_size))
     if not mongo_documents:
         break
@@ -54,9 +54,20 @@ while True:
     print(f"Fetched batch {batch_number + 1}")
 
     for doc in mongo_documents:
-        commodityCode = doc['item']['commodityCode'][:25]
-        commodityNameTH = doc['item']['commodityNameTH'][:400]
-        unitName = doc['item']['unitName'][:255]
+        item = doc.get('item', {})
+        commodityCode = item.get('commodityCode', '')
+        commodityNameTH = item.get('commodityNameTH', '')
+        unitName = item.get('unitName', '')
+
+        # เช็กข้อมูลครบถ้วน
+        if not commodityCode or not commodityNameTH or not unitName:
+            print(f"Skipping doc due to missing field: {doc}")
+            continue
+
+        # ตัดความยาวตามที่กำหนด
+        commodityCode = commodityCode[:25]
+        commodityNameTH = commodityNameTH[:400]
+        unitName = unitName[:255]
 
         # นับข้อมูลรวม
         total_data += 1

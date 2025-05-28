@@ -42,7 +42,7 @@ inserted_count = 0
 inserted_items = []  # เก็บ MatID และ SC3No ที่ถูกแทรก
 
 # ขนาดของแต่ละหน้า
-batch_size = 20
+batch_size = 50
 batch_number = 0
 
 while True:
